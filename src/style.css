@@ -1,12 +1,9 @@
-/* src/style.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base reset to match PDFCandy style */
 body {
   margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+  min-width: 400px;
   background-color: white;
 }
