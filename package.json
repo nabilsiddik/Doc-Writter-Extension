@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "framer-motion": "^12.42.0",
     "lucide-react": "^1.22.0",
     "plasmo": "0.90.5",
     "react": "18.2.0",
@@ -20,7 +21,7 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@tailwindcss/postcss": "^4.3.1",
     "@types/chrome": "0.0.258",
-    "@types/node": "20.11.5",
+    "@types/node": "^20.19.43",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
     "autoprefixer": "^10.5.2",
@@ -39,9 +40,9 @@
       "http://localhost:3000/*"
     ],
     "permissions": [
-       "activeTab",
-        "scripting",
-        "storage"
+      "activeTab",
+      "scripting",
+      "storage"
     ],
     "externally_connectable": {
       "matches": [
