@@ -34,12 +34,21 @@
       "https://*.amazon.com/*",
       "https://*.daraz.com.bd/*",
       "https://*.aliexpress.com/*",
-      "https://api.aicandy.com/*"
+      "https://api.aicandy.com/*",
+      "http://localhost:5000/*",
+      "http://localhost:3000/*"
     ],
     "permissions": [
-      "storage",
-      "activeTab",
-      "scripting"
-    ]
+       "activeTab",
+        "scripting",
+        "storage"
+    ],
+    "externally_connectable": {
+      "matches": [
+        "http://localhost:3000/*",
+        "https://aicandy.com/*",
+        "https://www.aicandy.com/*"
+      ]
+    }
   }
 }

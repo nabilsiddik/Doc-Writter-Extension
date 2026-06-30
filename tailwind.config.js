@@ -3,10 +3,8 @@ module.exports = {
   mode: "jit",
   darkMode: "class",
   content: [
-    "./src/**/*.{ts,tsx,html}",
-    "./src/utils/popup.tsx", 
-    "./options.tsx",
-    "./background.ts"
+     "./src/**/*.{ts,tsx,html}",
+    "./popup.tsx",
   ],
   theme: {
     extend: {
