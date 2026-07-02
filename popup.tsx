@@ -341,7 +341,9 @@ export default function IndexPopup() {
           sync data to your store.
         </p>
         <button
-          onClick={() => window.open("http://localhost:3000/login", "_blank")}
+          onClick={() =>
+            window.open(`${process.env.PLASMO_CLIENT_URL}/login`, "_blank")
+          }
           className="w-full py-6 bg-primary text-white rounded-[25px] font-black text-xl flex items-center justify-center gap-4 shadow-2xl hover:bg-indigo-700 transition-all cursor-pointer">
           <LogIn size={24} />
           Go to Sign In

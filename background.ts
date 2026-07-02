@@ -25,7 +25,7 @@ browser.runtime.onMessage.addListener(async (request) => {
     const { token, payload } = request
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/document/generate-content",
+        `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/generate-content`,
         {
           method: "POST",
           headers: {
