@@ -1,130 +1,8 @@
-// import type { PlasmoCSConfig } from "plasmo"
-// import { useEffect } from "react"
-// import browser from "webextension-polyfill"
-
-// export const config: PlasmoCSConfig = {
-//   matches: [
-//     "https://www.amazon.com/*",
-//     "https://www.daraz.com.bd/*",
-//     "https://daraz.com.bd/*"
-//   ]
-// }
-
-// const Injector = () => {
-//   useEffect(() => {
-//     const injectUI = () => {
-//       const selectors = [
-//         // Amazon Selectors
-//         'div[data-component-type="s-search-result"]',
-//         'div.s-result-item[data-asin]:not([data-asin=""])',
-
-//         // Daraz selectors
-//         'div[data-qa-locator="product-item"]',
-//         ".card-jfy-wrapper .pc-custom-link",
-
-//         // Aliexpress selectors
-//         "div[data-product-id]"
-//       ]
-
-//       const productCards = document.querySelectorAll(selectors.join(","))
-
-//       productCards.forEach((el) => {
-//         const card = el as HTMLElement
-
-//         // Safety: Ignore parent containers or already injected cards
-//         if (
-//           card.querySelector(".aicandy-select-wrapper") ||
-//           card.offsetHeight < 100
-//         )
-//           return
-
-//         // Create Premium Checkbox Wrapper
-//         const wrapper = document.createElement("div")
-//         wrapper.className = "aicandy-select-wrapper"
-//         wrapper.style.cssText = `
-//           position: absolute;
-//           top: 10px;
-//           left: 10px;
-//           z-index: 999999;
-//           background: white;
-//           border-radius: 8px;
-//           padding: 2px;
-//           display: flex;
-//           box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-//         `
-
-//         const checkbox = document.createElement("input")
-//         checkbox.type = "checkbox"
-//         checkbox.style.cssText = `width: 24px; height: 24px; cursor: pointer; accent-color: #6366f1;`
-
-//         checkbox.addEventListener("change", async () => {
-//           // 2. TARGETED DATA EXTRACTION (Inside this specific card ONLY)
-//           // We look for title/price relative to the current 'card' element
-//           const titleEl = card.querySelector(
-//             "h2, .title--wNxvH, .hp-mod-card-title, span.a-text-normal"
-//           )
-//           const priceEl = card.querySelector(
-//             ".a-price-whole, .price--be93Q, .hp-mod-card-price, .pdp-price"
-//           )
-//           const imgEl = card.querySelector("img") as HTMLImageElement
-
-//           // Handle lazy-loaded images (Daraz/Amazon often use data-src)
-//           const imgSrc = imgEl?.getAttribute("data-src") || imgEl?.src || ""
-
-//           const product = {
-//             id:
-//               card.getAttribute("data-asin") ||
-//               card.getAttribute("data-id") ||
-//               titleEl?.textContent?.trim() ||
-//               Math.random().toString(),
-//             title: titleEl?.textContent?.trim() || "Unknown Product",
-//             price: priceEl?.textContent?.trim() || "0",
-//             img: imgSrc,
-//             url: card.querySelector("a")?.href || window.location.href,
-//             source: "AMAZON"
-//           }
-
-//           const { selectedProducts = [] } =
-//             await browser.storage.local.get("selectedProducts")
-
-//           let newList
-//           if (checkbox.checked) {
-//             newList = [
-//               ...selectedProducts.filter((p: any) => p.id !== product.id),
-//               product
-//             ]
-//           } else {
-//             newList = selectedProducts.filter((p: any) => p.id !== product.id)
-//           }
-
-//           await browser.storage.local.set({ selectedProducts: newList })
-//         })
-
-//         wrapper.appendChild(checkbox)
-//         card.style.position = "relative"
-//         card.style.border = checkbox.checked
-//           ? "2px solid #6366f1"
-//           : card.style.border
-//         card.prepend(wrapper)
-//       })
-//     }
-
-//     // Run immediately and then watch for scrolls
-//     injectUI()
-//     const observer = new MutationObserver(injectUI)
-//     observer.observe(document.body, { childList: true, subtree: true })
-
-//     return () => observer.disconnect()
-//   }, [])
-
-//   return null
-// }
-
-// export default Injector
-
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect } from "react"
 import browser from "webextension-polyfill"
+
+import { getAmount } from "~utils/cleanPriceString"
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -166,11 +44,43 @@ const SCRAPER_CONFIG: Record<string, any> = {
     idAttr: "id"
   },
   aliexpress: {
-    selectors: ["div[data-product-id]", ".list--galleryItem--pXew_"],
-    titles: ["h1", "[class*='titleText']", "[class*='product-title']"],
-    price: "[class*='price-current'], .multi--price-sale--955",
+    selectors: [
+      "div[data-product-ids]",
+      "#more-to-love .kl_oy a",
+      ".list--galleryItem--pXew_",
+      ".multi--container--1_879W_",
+      "div[class*='product-card']"
+    ],
+    titles: [
+      "#more-to-love .kl_oy a span.rc-title-content",
+      "div[data-product-ids] h3.iz_ap"
+    ],
+    price: [
+      "#more-to-love .kl_oy a div.nk_ix span:nth-child(2)",
+      "div[data-product-ids] span.lb_jl"
+    ],
     img: "img",
-    idAttr: "data-spm-anchor-id"
+    idAttr: "data-product-id"
+  },
+  walmart: {
+    selectors: [
+      "div[data-item-id]",
+      "[data-testid='grid-view']",
+      "[data-testid='list-view']"
+    ],
+    titles: [
+      "[data-automation-id='product-title']",
+      "span[data-testid='product-title']",
+      ".mb1-m"
+    ],
+    price: [
+      "[data-automation-id='product-price']",
+      "div[data-testid='variant-price']",
+      ".f2",
+      ".mr1"
+    ],
+    img: "img",
+    idAttr: "data-item-id"
   }
 }
 
@@ -239,6 +149,12 @@ const Injector = () => {
             const titleLink = titleEl?.closest("a")?.href
             productUrl = titleLink || window.location.href
           }
+          let productPrice = priceEl?.textContent?.trim() || "0"
+          alert(`Extracted Price: ${productPrice}`)
+
+          if (site.name === "ALIEXPRESS") {
+            productPrice = getAmount(productPrice)
+          }
 
           const product = {
             id:
@@ -246,7 +162,7 @@ const Injector = () => {
               titleEl?.textContent?.trim() ||
               Math.random().toString(),
             title: titleEl?.textContent?.trim() || "Unknown Product",
-            price: priceEl?.textContent?.trim() || "0",
+            price: productPrice || "0",
             img: imgSrc,
             url: productUrl,
             source: site.name
