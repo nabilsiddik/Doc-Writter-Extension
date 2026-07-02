@@ -163,7 +163,7 @@ const SCRAPER_CONFIG: Record<string, any> = {
       ".Ms6aG .aBrP0 span.ooOxS"
     ],
     img: "img",
-    idAttr: "data-id"
+    idAttr: "id"
   },
   aliexpress: {
     selectors: ["div[data-product-id]", ".list--galleryItem--pXew_"],
