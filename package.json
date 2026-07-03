@@ -34,25 +34,25 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "externally_connectable": {
+      "matches": [
+        "http://localhost:3000/*",
+        "https://assignment-writer-app.vercel.app/*"
+      ]
+    },
     "host_permissions": [
       "https://*.amazon.com/*",
       "https://*.daraz.com.bd/*",
       "https://*.aliexpress.com/*",
       "https://api.aicandy.com/*",
       "http://localhost:5000/*",
+      "https://assignment-writer-server.onrender.com/*",
       "http://localhost:3000/*"
     ],
     "permissions": [
       "activeTab",
       "scripting",
       "storage"
-    ],
-    "externally_connectable": {
-      "matches": [
-        "http://localhost:3000/*",
-        "https://aicandy.com/*",
-        "https://www.aicandy.com/*"
-      ]
-    }
+    ]
   }
 }

@@ -66,7 +66,7 @@ export default function IndexPopup() {
     setIsConnecting(true)
     try {
       const res = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/connect-woocommerce`,
+        `https://assignment-writer-server.onrender.com/api/v1/document/connect-woocommerce`,
         {
           method: "POST",
           headers: {
@@ -92,7 +92,10 @@ export default function IndexPopup() {
   }
 
   const handleGoogleConnect = () => {
-    window.open(`${process.env.PLASMO_PUBLIC_SERVER_URL}/auth/google`, "_blank")
+    window.open(
+      `https://assignment-writer-server.onrender.com/api/v1/auth/google`,
+      "_blank"
+    )
   }
 
   const handleClear = async () => {
@@ -206,7 +209,7 @@ export default function IndexPopup() {
     setLoading(true)
 
     if (!token) {
-      window.open(`${process.env.PLASMO_PUBLIC_SITE_URL}/login`, "_blank")
+      window.open(`https://assignment-writer-app.vercel.app/login`, "_blank")
       setLoading(false)
       return
     }
@@ -225,7 +228,7 @@ export default function IndexPopup() {
 
     try {
       const statusRes = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/user/me`,
+        `https://assignment-writer-server.onrender.com/api/v1/user/me`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -267,7 +270,7 @@ export default function IndexPopup() {
       )
 
       const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/bulk-sync`,
+        `https://assignment-writer-server.onrender.com/api/v1/document/bulk-sync`,
         {
           method: "POST",
           headers: {
@@ -283,6 +286,8 @@ export default function IndexPopup() {
       )
 
       const result = await response.json()
+
+      console.log("Bulk Sync Result:", result)
 
       if (result.success) {
         // 5. SUCCESS: Clear local storage and show feedback
@@ -342,7 +347,10 @@ export default function IndexPopup() {
         </p>
         <button
           onClick={() =>
-            window.open(`${process.env.PLASMO_CLIENT_URL}/login`, "_blank")
+            window.open(
+              `https://assignment-writer-app.vercel.app/login`,
+              "_blank"
+            )
           }
           className="w-full py-6 bg-primary text-white rounded-[25px] font-black text-xl flex items-center justify-center gap-4 shadow-2xl hover:bg-indigo-700 transition-all cursor-pointer">
           <LogIn size={24} />
