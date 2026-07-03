@@ -40,7 +40,8 @@
       "https://*.aliexpress.com/*",
       "https://api.aicandy.com/*",
       "http://localhost:5000/*",
-      "http://localhost:3000/*"
+      "http://localhost:3000/*",
+      "https://assignment-writer-server.onrender.com/*"
     ],
     "permissions": [
       "activeTab",
