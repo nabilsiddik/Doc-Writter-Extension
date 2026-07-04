@@ -24,7 +24,7 @@
   "exclude": ["node_modules"],
   "include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx", "index.d.ts" ],
   "compilerOptions": {
-    "types": ["node"],
+    "types": ["chrome","node"],
     "paths": {
       "~*": ["./*"]
     },
