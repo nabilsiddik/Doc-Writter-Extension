@@ -2,7 +2,6 @@ import browser from "webextension-polyfill"
 
 browser.runtime.onMessageExternal.addListener(
   (message, sender, sendResponse) => {
-    console.log(message, "message")
     if (message.type === "AUTH_TOKEN") {
       browser.storage.local.set({ token: message.token }).then(() => {
         sendResponse({ success: true, message: "Token stored in extension" })
@@ -12,7 +11,6 @@ browser.runtime.onMessageExternal.addListener(
 
     if (message.type === "LOGOUT_EVENT") {
       browser.storage.local.remove("token").then(() => {
-        console.log("Extension: Token cleared via Website Logout")
         sendResponse({ success: true })
       })
     }

@@ -66,7 +66,7 @@ export default function IndexPopup() {
     setIsConnecting(true)
     try {
       const res = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/connect-woocommerce`,
+        `https://assignment-writer-server.onrender.com/api/v1/document/connect-woocommerce`,
         {
           method: "POST",
           headers: {
@@ -92,7 +92,10 @@ export default function IndexPopup() {
   }
 
   const handleGoogleConnect = () => {
-    window.open(`${process.env.PLASMO_PUBLIC_SERVER_URL}/auth/google`, "_blank")
+    window.open(
+      `https://assignment-writer-server.onrender.com/api/v1/auth/google`,
+      "_blank"
+    )
   }
 
   const handleClear = async () => {
@@ -109,104 +112,12 @@ export default function IndexPopup() {
     await browser.storage.local.set({ selectedProducts: updated })
   }
 
-  // const handleSyncAction = async (target: "SHEETS" | "WOO") => {
-  //   setLoading(true)
-
-  //   if (!token) {
-  //       window.open(`${process.env.PLASMO_PUBLIC_SITE_URL}/login`, "_blank");
-  //       return;
-  //   }
-
-  //   try{
-  //     const response = await fetch(`${process.env.PLASMO_PUBLIC_SERVER_URL}/user/me`, {
-  //     headers: { Authorization: `Bearer ${token}` }
-  //     });
-  //     const result = await response.json();
-  //     if (!result.success) {
-  //       setToken(null);
-  //       await browser.storage.local.remove("token");
-  //       return;
-  //     }
-
-  //     const { integrations } = result.data;
-
-  //     if (target === "WOO") {
-  //        if (!integrations.woocommerce) {
-  //           setView("WOO_CONNECT");
-  //           setLoading(false);
-  //           return;
-  //         }
-  //     }
-
-  //     if (target === "SHEETS") {
-  //       if (!integrations.googleSheets) {
-  //         setView("GOOGLE_CONNECT");
-  //         setLoading(false);
-  //         return;
-  //       }
-  //     }
-
-  //     await executeBulkSync(target);
-
-  //   }catch(error){
-  //       toast.error("Connection error. Please try again.");
-  //   }finally {
-  //     setLoading(false);
-  //   }
-
-  //   // Check connection status from backend
-  //   const statusRes = await fetch(
-  //     `${process.env.PLASMO_PUBLIC_SERVER_URL}/dashboard/overview`,
-  //     {
-  //       headers: { Authorization: `Bearer ${token}` }
-  //     }
-  //   )
-  //   const status = await statusRes.json()
-
-  //   // Conditional Modals
-  //   if (target === "WOO" && !status.data.integrations.woocommerce) {
-  //     setIsWooModalOpen(true)
-  //     setLoading(false)
-  //     return
-  //   }
-
-  //   if (target === "SHEETS" && !status.data.integrations.google) {
-  //     setIsGoogleModalOpen(true) // Your "Login with Google" Modal
-  //     setLoading(false)
-  //     return
-  //   }
-
-  //   // 3. Execute Bulk Process
-  //   const res = await fetch(
-  //     `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/bulk-process`,
-  //     {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`
-  //       },
-  //       body: JSON.stringify({
-  //         items: selectedProducts,
-  //         mode: exportType, // 'RAW' or 'AI'
-  //         target: target // 'SHEETS' or 'WOO'
-  //       })
-  //     }
-  //   )
-
-  //   const result = await res.json()
-  //   if (result.success) {
-  //     toast.success(`Successfully processed ${selectedProducts.length} items!`)
-  //     await browser.storage.local.set({ selectedProducts: [] }) // Clear tray
-  //   }
-  //   setLoading(false)
-  // }
-
   const handleSyncAction = async (target: "SHEETS" | "WOO") => {
     // Initial State Control
     setLoading(true)
 
     if (!token) {
-      window.open(`${process.env.PLASMO_PUBLIC_SITE_URL}/login`, "_blank")
+      window.open(`https://assignment-writer-app.vercel.app/login`, "_blank")
       setLoading(false)
       return
     }
@@ -219,21 +130,27 @@ export default function IndexPopup() {
       return
     }
 
+    if (selectedProducts?.length > 3) {
+      toast.error(
+        "Currently you can export up to 3 products at a time."
+      )
+      setLoading(false)
+      return
+    }
+
     const toastId = toast.loading(
       `Initializing ${target === "WOO" ? "WooCommerce" : "Sheets"} sync...`
     )
 
     try {
       const statusRes = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/user/me`,
+        `https://assignment-writer-server.onrender.com/api/v1/user/me`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       )
-      console.log("Status Response:", statusRes)
 
       const userData = await statusRes.json()
-      console.log("User Data:", userData)
 
       if (!userData.success) {
         toast.error("Session expired. Please sign in again.", { id: toastId })
@@ -243,7 +160,6 @@ export default function IndexPopup() {
       }
 
       const { integrations } = userData?.data
-      console.log(integrations)
 
       if (target === "WOO" && !integrations.woocommerce) {
         toast.dismiss(toastId)
@@ -267,7 +183,7 @@ export default function IndexPopup() {
       )
 
       const response = await fetch(
-        `${process.env.PLASMO_PUBLIC_SERVER_URL}/document/bulk-sync`,
+        `https://assignment-writer-server.onrender.com/api/v1/document/bulk-sync`,
         {
           method: "POST",
           headers: {
@@ -325,7 +241,6 @@ export default function IndexPopup() {
     }
   }
 
-  console.log(token, "my token")
 
   if (!token) {
     return (
@@ -342,7 +257,10 @@ export default function IndexPopup() {
         </p>
         <button
           onClick={() =>
-            window.open(`https://assignment-writer-app.vercel.app/login`, "_blank")
+            window.open(
+              `https://assignment-writer-app.vercel.app/login`,
+              "_blank"
+            )
           }
           className="w-full py-6 bg-primary text-white rounded-[25px] font-black text-xl flex items-center justify-center gap-4 shadow-2xl hover:bg-indigo-700 transition-all cursor-pointer">
           <LogIn size={24} />
@@ -458,7 +376,7 @@ export default function IndexPopup() {
         </h2>
         <p className="text-slate-500 text-xl leading-relaxed mb-12 px-2">
           To export items to{" "}
-          <span className="text-black font-bold">Google Sheets</span>, AICandy
+          <span className="text-black font-bold">Google Sheets</span>, We
           needs permission to manage files in your Drive.
         </p>
 

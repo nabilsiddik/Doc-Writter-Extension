@@ -260,6 +260,7 @@ const SCRAPER_CONFIG: Record<string, any> = {
   aliexpress: {
     selectors: [
       "div[data-product-ids]",
+      ".ne_nh",
       "div[data-product-id]",
       ".list--galleryItem--pXew_",
       ".multi--container--1_879W_"

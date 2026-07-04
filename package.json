@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "chrome": "^0.1.0",
     "framer-motion": "^12.42.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.22.0",
@@ -23,7 +24,7 @@
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@tailwindcss/postcss": "^4.3.1",
-    "@types/chrome": "0.0.258",
+    "@types/chrome": "^0.0.258",
     "@types/node": "^20.19.43",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
@@ -34,26 +35,25 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "externally_connectable": {
+      "matches": [
+        "http://localhost:3000/*",
+        "https://assignment-writer-app.vercel.app/*"
+      ]
+    },
     "host_permissions": [
       "https://*.amazon.com/*",
       "https://*.daraz.com.bd/*",
       "https://*.aliexpress.com/*",
       "https://api.aicandy.com/*",
       "http://localhost:5000/*",
-      "http://localhost:3000/*",
-      "https://assignment-writer-server.onrender.com/*"
+      "https://assignment-writer-server.onrender.com/*",
+      "http://localhost:3000/*"
     ],
     "permissions": [
       "activeTab",
       "scripting",
       "storage"
-    ],
-    "externally_connectable": {
-      "matches": [
-        "http://localhost:3000/*",
-        "https://aicandy.com/*",
-        "https://www.aicandy.com/*"
-      ]
-    }
+    ]
   }
 }
