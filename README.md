@@ -1,33 +1,50 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Ai Writter - Automate document writting publish to platforms
 
-## Getting Started
+## Description
 
-First, run the development server:
+Ai Writter is such a platform that generates content using LLM depending on users topic and detailed prompt and then export to different kind of documents like PDF, Word, Google docs, Google Sheets etc or upload directly to platforms like Google Drive, Woocommerce and so one.
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+It saves users time effort by generating high quality content using LLMs like Open Ai, Claude, Gemini, Lama etc and automate repetitive work.
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+It focuses on subscription based SASS model built with Node.js, Express.js, Typescript, Next.js, Langgraph.js.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+## Project Links
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+### Live Demo
 
-## Making production build
+- **Frontend:** https://assignment-writer-app.vercel.app
+- **Backend API:** https://assignment-writer-server.onrender.com
 
-Run the following:
+### GitHub
 
-```bash
-pnpm build
-# or
-npm run build
-```
+- **Frontend Repository:** https://github.com/nabilsiddik/Assignment-Writer-App
+- **Backend Repository:** https://github.com/nabilsiddik/Assignment-Writer-Server
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
 
-## Submit to the webstores
+## Key Features
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+- **AI Content Generation:** High quality content generation using LLMs like Open Ai, Claude, Gemini, Lama etc and automate repetitive work.
+- **Export Import Products:** Export product from AMAZON, ALIEXPRESS, DARAZ and import to google sheet or direct upload to woocommerce after ai writter.
+- **Dynamic Tool Registry:** Very Scalable code to add new document types in langgraph in minutes without logic changes.
+- **Multi-Format Export:** Binary streaming for `.docx`, HTML-to-PDF via Puppeteer, and Google Docs, google drive, google sheet, woocommerce API integration.
+- **Subscription Lifecycle:** Full Stripe subscription implemented with different type plans.
+- **Authentication & Authorization:** JWT access token and refresh token based authentication and role based authorization and redirect with email and reset password otp verification proccess.
+- **Rate Limit:** Upstash Redis for global rate-limiting depending on subscription plans.
+- **Middleware:** Different type of middlewares to make the platform fully secured like checkAuth, checkSubscriptionPlan, checkRateLimit etc.
+- **Storage Integration:** Upload document to cloudinary, delete from cloudinary if necessary to save cost.
+- **Advance Dashboard Analytics:** Unlike random dashbaord analytics, it includes deep details like how many tokens are using for each input and output and cost for each response. Platform revenue based on subscriptions and LLM cost etc.
+
+## Tools & Technologies
+
+- **Extension:** Plasmo
+- **Runtime:** Node.js (v20+)
+- **Language:** TypeScript
+- **Framework:** Express.js, Next.js
+- **Database:** PostgreSQL (Prisma ORM)
+- **AI Stack:** LangChain, LangGraph JS, Claude 3.5 (Anthropic), Open Ai, Gemini, Lama etc.
+- **Security:** JWT, OAuth 2.0 (Google)
+- **Payments:** Stripe API
+- **Rate Limit:** Upstash Redis
+- **Storage:** Cloudinary, Google Drive
+- **HTML to PDF:** Puppeteer
+- **Animation & Icon:** Framer motion, Lucid React, React Icon Library
