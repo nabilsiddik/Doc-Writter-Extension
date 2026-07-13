@@ -30,7 +30,7 @@ export default function IndexPopup() {
   )
   const [isConnecting, setIsConnecting] = useState(false)
   const [selectedProducts, setSelectedProducts] = useState<any[]>([])
-  const [exportType, setExportType] = useState<"RAW" | "AI">("RAW")
+  const [exportType, setExportType] = useState<"RAW" | "AI">("AI")
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -248,11 +248,12 @@ export default function IndexPopup() {
         <div className="w-24 h-24 bg-primary/10 rounded-[32px] flex items-center justify-center mx-auto mb-8 text-primary shadow-xl shadow-primary/10">
           <User size={48} />
         </div>
-        <h1 className="text-3xl font-black mb-4 tracking-tight">
+        <h1 className="text-3xl font-black mb-2 tracking-tight">
           Authentication Required
         </h1>
+        <h3 className="text-[#ff6321] text-3xl font-bold mb-4">DroppEcommerce</h3>
         <p className="text-slate-500 text-xl leading-relaxed mb-12 px-4">
-          Please sign in to your AICandy account to access the AI Studio and
+          Please sign in to your DroppEcommerce account to access the AI Studio and
           sync data to your store.
         </p>
         <button
@@ -262,12 +263,12 @@ export default function IndexPopup() {
               "_blank"
             )
           }
-          className="w-full py-6 bg-primary text-white rounded-[25px] font-black text-xl flex items-center justify-center gap-4 shadow-2xl hover:bg-indigo-700 transition-all cursor-pointer">
+          className="w-full py-6 bg-indigo-700 text-white rounded-[25px] font-black text-xl flex items-center justify-center gap-4 shadow-2xl hover:bg-indigo-700 transition-all cursor-pointer">
           <LogIn size={24} />
           Go to Sign In
         </button>
         <p className="mt-8 text-slate-400 font-bold uppercase tracking-widest text-base italic">
-          Powering the next gen of dropshipping
+          Developed by <a target="_blank" href="https://nabilsiddik.vercel.app">Nabil Siddik</a>
         </p>
       </div>
     )
@@ -402,7 +403,7 @@ export default function IndexPopup() {
             <Sparkles size={20} />
           </div>
           <span className="text-xl font-black">
-            AICandy <span className="text-slate-300">Studio</span>
+           DroppEcommerce
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -481,15 +482,16 @@ export default function IndexPopup() {
 
         <div className="grid grid-cols-2 gap-4 mb-10">
           <button
-            onClick={() => setExportType("RAW")}
-            className={`py-5 rounded-2xl font-black border-2 transition-all cursor-pointer text-lg ${exportType === "RAW" ? "border-primary bg-primary/5 text-primary" : "border-slate-100 text-slate-400"}`}>
-            Raw Sync
-          </button>
-          <button
             onClick={() => setExportType("AI")}
             className={`py-5 rounded-2xl font-black border-2 transition-all cursor-pointer text-lg ${exportType === "AI" ? "border-secondary bg-secondary/5 text-secondary" : "border-slate-100 text-slate-400"}`}>
             AI Agent
           </button>
+          <button
+            onClick={() => setExportType("RAW")}
+            className={`py-5 rounded-2xl font-black border-2 transition-all cursor-pointer text-lg ${exportType === "RAW" ? "border-primary bg-primary/5 text-primary" : "border-slate-100 text-slate-400"}`}>
+            Raw Sync
+          </button>
+          
         </div>
 
         <div className="space-y-4">
