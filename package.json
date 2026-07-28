@@ -48,6 +48,7 @@
       "https://api.aicandy.com/*",
       "http://localhost:5000/*",
       "https://assignment-writer-server.onrender.com/*",
+      "https://moveon.global/*",
       "http://localhost:3000/*"
     ],
     "permissions": [
