@@ -48,9 +48,13 @@ const SCRAPER_CONFIG: Record<string, any> = {
     idAttr: "id"
   },
   aliexpress: {
-    selectors: ["#more-to-love .nj_nm"],
+    selectors: ["#more-to-love .nj_nm", "[data-product-ids]"],
     titles: ["span.rc-title-content", "h3.iz_ap", "h1", "[class*='titleText']"],
-    price: ["#more-to-love .nj_nm a .np_iq span:nth-child(2)"],
+    price: [
+      "#more-to-love .nj_nm a .np_iq span:nth-child(2)",
+      ,
+      "[data-product-ids] .la_ki"
+    ],
     img: "img",
     idAttr: "data-product-id"
   },
