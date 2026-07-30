@@ -1,5 +1,10 @@
 import browser from "webextension-polyfill"
 
+// Logic to open sidepanel on icon click
+browser.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));
+
 browser.runtime.onMessageExternal.addListener(
   (message, sender, sendResponse) => {
     if (message.type === "AUTH_TOKEN") {

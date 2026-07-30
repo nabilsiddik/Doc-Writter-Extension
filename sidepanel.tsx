@@ -43,6 +43,11 @@ export default function IndexPopup() {
         setToken(newToken || null)
         setView(newToken ? "MAIN" : "LOGIN")
       }
+
+      if (changes.selectedProducts) {
+        console.log("Storage Updated: New products detected")
+        setSelectedProducts(changes.selectedProducts.newValue || [])
+      }
     }
     browser.storage.onChanged.addListener(handleUpdate)
     return () => browser.storage.onChanged.removeListener(handleUpdate)
@@ -574,7 +579,7 @@ export default function IndexPopup() {
             AI Agent
           </button>
           <button
-            onClick={() => setExportType("RAW")}
+            // onClick={() => setExportType("RAW")}
             className={`py-5 rounded-2xl font-black border-2 transition-all cursor-pointer text-lg flex items-center justify-center gap-2 ${
               exportType === "RAW" 
                 ? "border-primary bg-primary/5 text-primary shadow-inner" 
@@ -588,14 +593,14 @@ export default function IndexPopup() {
 
         {/* --- 4. EXECUTION ACTIONS --- */}
         <div className="space-y-4">
-          <button
+          {/* <button
             onClick={() => handleSyncAction("SHEETS")}
             disabled={loading || selectedProducts?.length === 0}
             className="w-full py-6 bg-slate-900 text-white rounded-3xl font-black text-xl flex items-center justify-center gap-4 hover:bg-black transition-all cursor-pointer shadow-xl active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:grayscale"
           >
             {loading ? <Loader2 className="animate-spin" /> : <Globe size={24} />}
             Export to Sheets
-          </button>
+          </button> */}
           
           <button
             onClick={() => handleSyncAction("WOO")}
@@ -603,7 +608,7 @@ export default function IndexPopup() {
             className="w-full py-6 bg-white border-2 border-slate-200 text-black rounded-3xl font-black text-xl flex items-center justify-center gap-4 hover:border-primary transition-all cursor-pointer shadow-sm active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="animate-spin" /> : <ShoppingBag size={24} />}
-            Sync to WooCommerce
+            Upload to WooCommerce
           </button>
         </div>
 
