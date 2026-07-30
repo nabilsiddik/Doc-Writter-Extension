@@ -11,7 +11,7 @@ export const config: PlasmoCSConfig = {
     "https://daraz.com.bd/*",
     "https://*.aliexpress.com/*",
     "https://www.walmart.com/*",
-    "https://*.moveon.global/*" 
+    "https://*.moveon.global/*"
   ]
 }
 
@@ -48,45 +48,29 @@ const SCRAPER_CONFIG: Record<string, any> = {
     idAttr: "id"
   },
   aliexpress: {
-    selectors: [
-      "div[data-product-ids]",
-      ".ne_nh",
-      "div[data-product-id]",
-      ".list--galleryItem--pXew_",
-      ".multi--container--1_879W_"
-    ],
+    selectors: ["#more-to-love .nj_nm"],
     titles: ["span.rc-title-content", "h3.iz_ap", "h1", "[class*='titleText']"],
-    price: [
-      "div.nk_ix span:nth-child(2)",
-      "span.lb_jl",
-      "[class*='price-current']"
-    ],
+    price: ["#more-to-love .nj_nm a .np_iq span:nth-child(2)"],
     img: "img",
     idAttr: "data-product-id"
   },
   moveOn: {
-  selectors: [
-    "#products-list-container > div",
-  ],
-  titles: [
-    "#products-list-container > div h1",
-    "#products-list-container > div .tw-line-clamp-2"
-  ],
-  price: [
-    "#products-list-container > div p.tw-font-semibold" 
-  ],
-  img: "#products-list-container > div figure img, #products-list-container > div img",
-  idAttr: "data-product-id"
+    selectors: ["#products-list-container > div"],
+    titles: [
+      "#products-list-container > div h1",
+      "#products-list-container > div .tw-line-clamp-2"
+    ],
+    price: ["#products-list-container > div p.tw-font-semibold"],
+    img: "#products-list-container > div figure img, #products-list-container > div img",
+    idAttr: "data-product-id"
+  }
 }
-}
-
-
 
 const Injector = () => {
   useEffect(() => {
     const getSiteConfig = () => {
       const host = window.location.hostname
-      console.log(host, 'my host');
+      console.log(host, "my host")
       if (host.includes("amazon"))
         return { ...SCRAPER_CONFIG.amazon, name: "AMAZON" }
       if (host.includes("daraz"))
@@ -118,10 +102,7 @@ const Injector = () => {
 
       productCards.forEach((el) => {
         const card = el as HTMLElement
-        if (
-          card.querySelector(".aicandy-select-wrapper")
-        )
-          return
+        if (card.querySelector(".aicandy-select-wrapper")) return
 
         const wrapper = document.createElement("div")
         wrapper.className = "aicandy-select-wrapper"
@@ -135,13 +116,13 @@ const Injector = () => {
       display: flex;
       padding: 2px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `;
+    `
 
         const checkbox = document.createElement("input")
         checkbox.type = "checkbox"
-        checkbox.style.cssText = `width: 22px; height: 22px; cursor: pointer; accent-color: #6366f1;`;
+        checkbox.style.cssText = `width: 22px; height: 22px; cursor: pointer; accent-color: #6366f1;`
 
-        checkbox.addEventListener("click", (e) => e.stopPropagation());
+        checkbox.addEventListener("click", (e) => e.stopPropagation())
         checkbox.addEventListener("change", async () => {
           try {
             const titleEl = findFirstMatch(card, site.titles)
