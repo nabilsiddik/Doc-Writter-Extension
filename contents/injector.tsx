@@ -61,7 +61,7 @@ const SCRAPER_CONFIG: Record<string, any> = {
       "#products-list-container > div .tw-line-clamp-2"
     ],
     price: ["#products-list-container > div p.tw-font-semibold"],
-    img: "#products-list-container > div figure img, #products-list-container > div img",
+    img: "#products-list-container a figure img:nth-child(2)",
     idAttr: "data-product-id"
   }
 }
