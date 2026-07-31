@@ -27,6 +27,8 @@ import browser from "webextension-polyfill"
 
 import "./style.css"
 
+import { organizeCategories } from "~utils/organizeCategories"
+
 // Scalable View States
 type ViewState =
   | "MAIN"
@@ -42,6 +44,11 @@ export default function IndexPopup() {
   const [selectedProducts, setSelectedProducts] = useState<any[]>([])
   const [exportType, setExportType] = useState<"RAW" | "AI">("AI")
   const [isConnecting, setIsConnecting] = useState(false)
+
+  const [formattedCategories, setFormattedCategories] = useState<any[]>([])
+  const [globalCat, setGlobalCat] = useState<string>("")
+
+  console.log(globalCat, "cat id")
 
   // Auth Form States
   const [authData, setAuthData] = useState({
@@ -79,7 +86,23 @@ export default function IndexPopup() {
     return () => browser.storage.onChanged.removeListener(handleUpdate)
   }, [])
 
-  console.log(selectedProducts, "prod")
+  useEffect(() => {
+    if (token) {
+      fetch(`http://localhost:5000/api/v1/document/woo/categories`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.success && Array.isArray(res.data)) {
+            const tree = organizeCategories(res.data)
+            setFormattedCategories(tree)
+          }
+        })
+        .catch((err) => console.error("Category Fetch Error:", err))
+    }
+  }, [token])
+
+  console.log(formattedCategories, "for")
 
   // --- API Handlers ---
 
@@ -89,7 +112,7 @@ export default function IndexPopup() {
     const tid = toast.loading("Authenticating...")
 
     try {
-      const res = await fetch(`http://200.97.171.7:5000/api/v1/auth/login`, {
+      const res = await fetch(`http://localhost:5000/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -119,7 +142,7 @@ export default function IndexPopup() {
     const tid = toast.loading("Creating account...")
 
     try {
-      const res = await fetch(`http://200.97.171.7:5000/api/v1/user/register`, {
+      const res = await fetch(`http://localhost:5000/api/v1/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(authData)
@@ -154,7 +177,7 @@ export default function IndexPopup() {
     setIsConnecting(true)
     try {
       const res = await fetch(
-        `http://200.97.171.7:5000/api/v1/document/connect-woocommerce`,
+        `http://localhost:5000/api/v1/document/connect-woocommerce`,
         {
           method: "POST",
           headers: {
@@ -215,7 +238,7 @@ export default function IndexPopup() {
     )
 
     try {
-      const statusRes = await fetch(`http://200.97.171.7:5000/api/v1/user/me`, {
+      const statusRes = await fetch(`http://localhost:5000/api/v1/user/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
 
@@ -252,7 +275,7 @@ export default function IndexPopup() {
       )
 
       const response = await fetch(
-        `http://200.97.171.7:5000/api/v1/document/bulk-sync`,
+        `http://localhost:5000/api/v1/document/bulk-sync`,
         {
           method: "POST",
           headers: {
@@ -262,7 +285,8 @@ export default function IndexPopup() {
           body: JSON.stringify({
             items: selectedProducts,
             mode: exportType,
-            target: target
+            target: target,
+            globalCategoryId: globalCat
           })
         }
       )
@@ -505,10 +529,26 @@ export default function IndexPopup() {
       {/* Your existing MAIN view JSX with Tray Overview and Sync buttons */}
       <header className="p-6 border-b border-slate-100 flex items-center justify-between">
         {/* Logo and Logout as previously implemented */}
-        <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
           <Sparkles className="text-primary" />
           <span className="font-black text-xl">DroppEcommerce</span>
-        </div>
+        </div> */}
+        <a href="/" className="flex items-center gap-1 group">
+          <div className="">
+            {/* <Sparkles size={20} className="text-white" /> */}
+            {/* <img
+              src={"/assets/icon128.png"}
+              width="40"
+              height="40"
+              className="-rotate-15"
+              alt="shopping-bag-icon"
+            /> */}
+          </div>
+          <span className="text-3xl font-bold tracking-tighter">
+            <span>Drop</span>
+            <span className="text-primary">ecommerce</span>
+          </span>
+        </a>
         <button
           onClick={handleLogout}
           className="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-red-500 cursor-pointer">
@@ -540,6 +580,48 @@ export default function IndexPopup() {
               {selectedProducts?.length > 0 ? "Ready to process" : "Empty"}
             </span>
           </div>
+
+          {selectedProducts?.length > 0 && (
+            <div className="mb-5">
+              {/* <select
+                className="w-full bg-white border-2 border-slate-200 p-4 rounded-2xl font-black text-lg text-black focus:border-primary outline-none cursor-pointer appearance-none shadow-sm"
+                // style={{
+                //   backgroundImage:
+                //     "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e\")",
+                //   backgroundRepeat: "no-repeat",
+                //   backgroundPosition: "right 1rem center",
+                //   backgroundSize: "1.5em"
+                // }}
+              >
+                <option
+                  onChange={(e) => setGlobalCat(e.target.value)}
+                  value="">
+                  Default (Uncategorized)
+                </option>
+                {formattedCategories.map((cat) => (
+                  <option
+                    key={cat.id}
+                    value={cat.id}
+                    className="font-bold py-2">
+                    {cat.displayName}
+                  </option>
+                ))}
+              </select> */}
+              <select
+                value={globalCat}
+                onChange={(e) => setGlobalCat(e.target.value)} // When user clicks, update state with ID
+                className="w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-lg font-bold text-black outline-none focus:border-primary cursor-pointer transition-all">
+                <option value="">Uncategorized (Default)</option>
+
+                {/* Map through the categories you fetched from the backend */}
+                {formattedCategories?.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="max-h-[320px] overflow-y-auto pr-2 space-y-4 custom-scrollbar min-h-[120px]">
             <AnimatePresence mode="popLayout">
@@ -601,7 +683,7 @@ export default function IndexPopup() {
             onClick={() => setExportType("AI")}
             className={`py-5 rounded-2xl font-black border-2 transition-all cursor-pointer text-lg flex items-center justify-center gap-2 ${
               exportType === "AI"
-                ? "border-secondary bg-secondary/5 text-secondary shadow-inner"
+                ? "border-primary bg-secondary/5 text-primary shadow-inner"
                 : "border-slate-100 text-slate-400 bg-white hover:bg-slate-50"
             }`}>
             <Sparkles size={18} />

@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#6366f1", // Your Indigo
+        primary: "#ff6321", // Your Indigo
         secondary: "#a855f7", // Your Purple
       }
     }

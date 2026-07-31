@@ -111,16 +111,16 @@ const Injector = () => {
         const wrapper = document.createElement("div")
         wrapper.className = "aicandy-select-wrapper"
         wrapper.style.cssText = `
-      position: absolute; 
-      top: 10px; 
-      left: 10px; 
-      z-index: 9999999; 
-      background: white; 
-      border-radius: 6px; 
-      display: flex;
-      padding: 2px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `
+        position: absolute; 
+        top: 10px; 
+        left: 10px; 
+        z-index: 9999999; 
+        background: white; 
+        border-radius: 6px; 
+        display: flex;
+        padding: 2px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      `
 
         const checkbox = document.createElement("input")
         checkbox.type = "checkbox"

@@ -1,9 +1,9 @@
 {
-  "name": "doc-writter-extension",
-  "displayName": "Doc writter extension",
+  "name": "Dropecommerce",
+  "displayName": "Dropecommerce",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
-  "author": "Plasmo Corp. <foss@plasmo.com>",
+  "description": "Automate your ecommerce product upload. Import product directly from Amazon, Daraz, Aliexpress, Moveon etc to your WordPress Woocommerce store. Save time, effort and money. Very helpfull for dropshippers, affiliate marketers and those who wants to automate their product importation.",
+  "author": "Nabil Siddik. <nabilsiddik70@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
@@ -35,6 +35,20 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "icons": {
+      "16": "/assets/icon16.png",
+      "32": "/assets/icon32.png",
+      "48": "/assets/icon48.png",
+      "128": "/assets/icon128.png"
+    },
+    "action": {
+      "default_icon": {
+        "16": "/assets/icon16.png",
+        "32": "/assets/icon32.png",
+        "48": "/assets/icon48.png"
+      },
+      "default_title": "Open Dropecommerce"
+    },
     "externally_connectable": {
       "matches": [
         "http://localhost:3000/*",
