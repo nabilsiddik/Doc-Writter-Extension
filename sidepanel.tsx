@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion"
 import {
+  AlertCircle,
   ArrowRight,
   Box,
   ChevronLeft,
@@ -44,11 +45,15 @@ export default function IndexPopup() {
   const [selectedProducts, setSelectedProducts] = useState<any[]>([])
   const [exportType, setExportType] = useState<"RAW" | "AI">("AI")
   const [isConnecting, setIsConnecting] = useState(false)
+  const [wooStores, setWooStores] = useState<any[]>([])
+  const [selectedStoreId, setSelectedStoreId] = useState<string>("")
 
   const [formattedCategories, setFormattedCategories] = useState<any[]>([])
   const [globalCat, setGlobalCat] = useState<string>("")
 
-  console.log(globalCat, "cat id")
+  const [syncErrors, setSyncErrors] = useState<Record<string, string>>({})
+
+  console.log(selectedStoreId, "store id")
 
   // Auth Form States
   const [authData, setAuthData] = useState({
@@ -87,10 +92,35 @@ export default function IndexPopup() {
   }, [])
 
   useEffect(() => {
+    const getWooStores = async () => {
+      try {
+        const statusRes = await fetch(
+          `http://localhost:5000/api/v1/document/my-woo-stores`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        )
+        const result = await statusRes.json()
+
+        if (result?.success && result?.data) {
+          setWooStores(result.data)
+        }
+      } catch (err) {
+        console.error("Error fetching WooCommerce stores:", err)
+      }
+    }
+
+    getWooStores()
+  }, [])
+
+  useEffect(() => {
     if (token) {
-      fetch(`http://localhost:5000/api/v1/document/woo/categories`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      fetch(
+        `http://localhost:5000/api/v1/document/woo/${selectedStoreId}/categories`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
         .then((res) => res.json())
         .then((res) => {
           if (res.success && Array.isArray(res.data)) {
@@ -100,12 +130,11 @@ export default function IndexPopup() {
         })
         .catch((err) => console.error("Category Fetch Error:", err))
     }
-  }, [token])
+  }, [token, selectedStoreId])
 
   console.log(formattedCategories, "for")
 
   // --- API Handlers ---
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -283,6 +312,7 @@ export default function IndexPopup() {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
+            storeId: selectedStoreId,
             items: selectedProducts,
             mode: exportType,
             target: target,
@@ -293,26 +323,61 @@ export default function IndexPopup() {
 
       const result = await response.json()
 
-      if (result.success) {
-        // SUCCESS: Clear local storage and show feedback
-        await browser.storage.local.set({ selectedProducts: [] })
-        setSelectedProducts([])
+      if (result.success && result?.data) {
+        const { status, totals, summary } = result.data
+        setSyncErrors({})
 
-        toast.success(`Success! Uploaded ${selectedProducts.length} items.`, {
-          id: toastId,
-          description:
-            target === "WOO"
-              ? "Check your WooCommerce Drafts."
-              : "Check your Google Sheet."
-        })
+        if (status === "SUCCESS") {
+          toast.success(`All ${totals.success} items uploaded!`, {
+            id: toastId,
+            description: "Products are now live in your store."
+          })
+
+          await browser.storage.local.set({ selectedProducts: [] })
+          setSelectedProducts([])
+        } else {
+          // This covers PARTIAL_FAILED and FAILED
+          // --- STEP 1: Map errors to specific product URLs ---
+          const errors: Record<string, string> = {}
+          summary.forEach((item: any) => {
+            if (item.status === "FAILED") {
+              errors[item.link] = item.error
+            }
+          })
+          setSyncErrors(errors) // Update state to show in UI
+
+          if (status === "PARTIAL_FAILED") {
+            toast.warning(`Upload completed with issues`, {
+              id: toastId,
+              description: `${totals.success} succeeded, ${totals.failed} failed.`
+            })
+
+            const failedLinks = summary
+              .filter((s: any) => s.status === "FAILED")
+              .map((s: any) => s.link)
+            const remainingProducts = selectedProducts.filter((p: any) =>
+              failedLinks.includes(p.url)
+            )
+
+            await browser.storage.local.set({
+              selectedProducts: remainingProducts
+            })
+            setSelectedProducts(remainingProducts)
+          } else if (status === "FAILED") {
+            toast.error(`Critical Failure`, {
+              id: toastId,
+              description: "Check your API permissions or WooCommerce settings."
+            })
+          }
+        }
       } else {
         if (result.statusCode === 402) {
           toast.error("Plan Limit Reached", {
             id: toastId,
-            description: "Upgrade your plan for more daily AI generations."
+            description: "Upgrade your plan for more Upload."
           })
         } else {
-          toast.error(result.message || "Bulk synchronization failed", {
+          toast.error(result.message || "Bulk Upload failed", {
             id: toastId
           })
         }
@@ -328,7 +393,6 @@ export default function IndexPopup() {
   }
 
   // --- Styled Sub-Components ---
-
   const inputStyles =
     "w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-12 py-4 text-lg text-black placeholder:text-slate-300 focus:outline-none focus:border-primary transition-all"
   const labelStyles =
@@ -560,6 +624,22 @@ export default function IndexPopup() {
 
       <main className="p-6">
         {/* --- 1. SELECTION STATS --- */}
+        {wooStores.length > 0 && (
+          <div className="mb-10">
+            <h3 className="text-xl font-bold mb-2">Select Store</h3>
+            <select
+              value={selectedStoreId}
+              onChange={(e) => setSelectedStoreId(e.target.value)}
+              className="w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-lg font-bold text-black outline-none focus:border-primary cursor-pointer transition-all">
+              {wooStores?.length > 0 &&
+                wooStores.map((store) => (
+                  <option key={store?.id} value={store?.id}>
+                    {store?.storeName}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
         <div className="bg-slate-50 border border-slate-200 rounded-[32px] p-8 mb-8 text-center shadow-sm">
           <p className="text-primary font-black uppercase tracking-widest text-base mb-2">
             Bulk Capture Engine
@@ -569,7 +649,6 @@ export default function IndexPopup() {
             <span className="text-slate-400">Products</span>
           </h2>
         </div>
-
         {/* --- 2. PRODUCT TRAY --- */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-5 px-2">
@@ -625,8 +704,8 @@ export default function IndexPopup() {
 
           <div className="max-h-[320px] overflow-y-auto pr-2 space-y-4 custom-scrollbar min-h-[120px]">
             <AnimatePresence mode="popLayout">
-              {selectedProducts?.length > 0 ? (
-                selectedProducts.map((p, idx) => (
+              {/* {selectedProducts?.length > 0 ? (
+                selectedProducts?.map((p, idx) => (
                   <motion.div
                     key={p?.id || idx}
                     layout
@@ -672,11 +751,82 @@ export default function IndexPopup() {
                     Browse Amazon or Daraz and select products to fill your tray
                   </p>
                 </motion.div>
+              )} */}
+
+              {selectedProducts?.length > 0 ? (
+                selectedProducts.map((p) => {
+                  const hasError = syncErrors[p.url] // Check if this specific item has an error
+
+                  return (
+                    <motion.div
+                      key={p.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className={`flex flex-col p-4 bg-white border rounded-3xl transition-all group ${
+                        hasError
+                          ? "border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)] bg-red-50/10"
+                          : "border-slate-200 hover:border-primary/40 hover:shadow-lg"
+                      }`}>
+                      <div className="flex items-center gap-5">
+                        <div className="relative shrink-0">
+                          <img
+                            src={p.img}
+                            className="w-16 h-16 rounded-2xl object-cover bg-slate-50 border border-slate-100"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-lg font-black text-black truncate leading-tight mb-1">
+                            {p.title}
+                          </p>
+                          <p className="text-primary font-black text-base italic">
+                            {p.price}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => removeItem(p.id)}
+                          className="p-2 text-slate-300 hover:text-red-500 transition-all cursor-pointer">
+                          <X size={20} />
+                        </button>
+                      </div>
+
+                      {/* --- SHOW ERROR TEXT IF IT EXISTS --- */}
+                      {hasError && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          className="mt-3 pt-3 border-t border-red-100">
+                          <div className="flex items-start gap-2 text-red-500 bg-red-50 p-3 rounded-xl border border-red-100">
+                            <AlertCircle
+                              size={16}
+                              className="shrink-0 mt-0.5"
+                            />
+                            <p className="text-base font-bold leading-tight">
+                              {hasError.includes("401")
+                                ? "Store Auth Failed (401)"
+                                : hasError}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )
+                })
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-16 text-center border-2 border-dashed border-slate-100 rounded-[40px] bg-slate-50/30">
+                  <Package className="mx-auto text-slate-200 mb-4" size={56} />
+                  <p className="text-slate-400 font-bold text-lg leading-relaxed px-10">
+                    Browse Marketplaces and select products to fill your tray
+                  </p>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
-
         {/* --- 3. PROCESSING MODE TOGGLES --- */}
         <div className="grid grid-cols-2 gap-4 mb-10">
           <button
@@ -700,7 +850,6 @@ export default function IndexPopup() {
             Raw Sync
           </button>
         </div>
-
         {/* --- 4. EXECUTION ACTIONS --- */}
         <div className="space-y-4">
           {/* <button
@@ -712,19 +861,31 @@ export default function IndexPopup() {
             Export to Sheets
           </button> */}
 
-          <button
-            onClick={() => handleSyncAction("WOO")}
-            disabled={loading || selectedProducts?.length === 0}
-            className="w-full py-6 bg-white border-2 border-slate-200 text-black rounded-3xl font-black text-xl flex items-center justify-center gap-4 hover:border-primary transition-all cursor-pointer shadow-sm active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed">
-            {loading ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <ShoppingBag size={24} />
-            )}
-            Upload to WooCommerce
-          </button>
+          {wooStores.length > 0 ? (
+            <button
+              onClick={() => handleSyncAction("WOO")}
+              disabled={loading || selectedProducts?.length === 0}
+              className="w-full py-6 bg-white border-2 border-slate-200 text-black rounded-3xl font-black text-xl flex items-center justify-center gap-4 hover:border-primary transition-all cursor-pointer shadow-sm active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed">
+              {loading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <ShoppingBag size={24} />
+              )}
+              Upload to WooCommerce
+            </button>
+          ) : (
+            <button
+              onClick={() => setView("WOO_CONNECT")}
+              className="w-full py-6 bg-white border-2 border-slate-200 text-black rounded-3xl font-black text-xl flex items-center justify-center gap-4 hover:border-primary transition-all cursor-pointer shadow-sm active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed">
+              {loading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <ShoppingBag size={24} />
+              )}
+              Connect WooCommerce Store
+            </button>
+          )}
         </div>
-
         {/* Footer Credit */}
         <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-center gap-2 text-slate-300 font-bold text-base uppercase tracking-tighter">
           <ShieldCheck size={16} />
