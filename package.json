@@ -65,6 +65,8 @@
       "http://200.97.171.7:5000/*",
       "https://assignment-writer-server.onrender.com/*",
       "https://moveon.global/*",
+      "https://pbs.com.bd/*",
+      "https://www.wafilife.com/*",
       "http://localhost:3000/*"
     ],
     "permissions": [

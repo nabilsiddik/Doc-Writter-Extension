@@ -11,7 +11,9 @@ export const config: PlasmoCSConfig = {
     "https://daraz.com.bd/*",
     "https://*.aliexpress.com/*",
     "https://www.walmart.com/*",
-    "https://*.moveon.global/*"
+    "https://*.moveon.global/*",
+    "https://pbs.com.bd/*",
+    "https://www.wafilife.com/*"
   ]
 }
 
@@ -67,6 +69,20 @@ const SCRAPER_CONFIG: Record<string, any> = {
     price: ["#products-list-container > div p.tw-font-semibold"],
     img: "#products-list-container a figure img:nth-child(2)",
     idAttr: "data-product-id"
+  },
+  wafilife: {
+    selectors: [".relative .overflow-hidden"],
+    titles: [".relative .overflow-hidden .h-11 h2"],
+    price: [".relative .overflow-hidden a .-mx-1 .text-brand"],
+    img: ".relative .overflow-hidden a img",
+    idAttr: "data-product-id"
+  },
+  pbs: {
+    selectors: [".slick-slide"],
+    titles: [".relative .overflow-hidden .h-11 h2"],
+    price: [".relative .overflow-hidden a .-mx-1 .text-brand"],
+    img: ".relative .overflow-hidden a img",
+    idAttr: "data-product-id"
   }
 }
 
@@ -83,6 +99,9 @@ const Injector = () => {
         return { ...SCRAPER_CONFIG.aliexpress, name: "ALIEXPRESS" }
       if (host.includes("moveon"))
         return { ...SCRAPER_CONFIG.moveOn, name: "MOVEON" }
+      if (host.includes("wafilife"))
+        return { ...SCRAPER_CONFIG.wafilife, name: "WAFILIFE" }
+      if (host.includes("pbs")) return { ...SCRAPER_CONFIG.pbs, name: "PBS" }
       return null
     }
 

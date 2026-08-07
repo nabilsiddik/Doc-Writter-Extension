@@ -13,6 +13,7 @@ import {
   LogOut,
   Mail,
   Package,
+  Plus,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -62,6 +63,7 @@ export default function IndexPopup() {
     fullName: ""
   })
   const [wooData, setWooData] = useState({
+    storeName: "",
     storeUrl: "",
     consumerKey: "",
     consumerSecret: ""
@@ -111,7 +113,7 @@ export default function IndexPopup() {
     }
 
     getWooStores()
-  }, [])
+  }, [token, view])
 
   useEffect(() => {
     if (token) {
@@ -218,11 +220,13 @@ export default function IndexPopup() {
       )
       const result = await res.json()
 
-      if (result?.success) {
+      console.log(result, "amar result")
+
+      if (res.ok && result?.success) {
         toast.success("WooCommerce Store Connected!")
         setView("MAIN")
       } else {
-        toast.error(result?.message || "Invalid API keys")
+        toast.error(result?.message || "Failed to connect store")
       }
     } catch (error) {
       toast.error("Network error during connection")
@@ -511,6 +515,8 @@ export default function IndexPopup() {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         className="w-[450px] bg-white p-8 font-sans">
+        <Toaster position="top-center" richColors />
+
         <button
           onClick={() => setView("MAIN")}
           className="mb-8 flex items-center gap-3 text-slate-400 hover:text-black font-bold text-xl cursor-pointer group">
@@ -532,7 +538,20 @@ export default function IndexPopup() {
         <div className="space-y-6 mb-12">
           <div className="space-y-2">
             <label className="text-base font-black uppercase text-slate-400 ml-2">
-              Store URL
+              Store Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg focus:border-purple-500 outline-none transition-all"
+              placeholder="Give a store name"
+              value={wooData.storeName}
+              onChange={(e) =>
+                setWooData({ ...wooData, storeName: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-base font-black uppercase text-slate-400 ml-2">
+              Store URL <span className="text-red-500">*</span>
             </label>
             <input
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg focus:border-purple-500 outline-none transition-all"
@@ -545,7 +564,7 @@ export default function IndexPopup() {
           </div>
           <div className="space-y-2">
             <label className="text-base font-black uppercase text-slate-400 ml-2">
-              Consumer Key
+              Consumer Key <span className="text-red-500">*</span>
             </label>
             <input
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 text-lg focus:border-purple-500 outline-none transition-all"
@@ -558,7 +577,7 @@ export default function IndexPopup() {
           </div>
           <div className="space-y-2">
             <label className="text-base font-black uppercase text-slate-400 ml-2">
-              Consumer Secret
+              Consumer Secret <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -624,9 +643,17 @@ export default function IndexPopup() {
 
       <main className="p-6">
         {/* --- 1. SELECTION STATS --- */}
-        {wooStores.length > 0 && (
+        {wooStores.length > 0 ? (
           <div className="mb-10">
-            <h3 className="text-xl font-bold mb-2">Select Store</h3>
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <h3 className="text-xl font-bold">Select Store</h3>
+              <span
+                onClick={() => setView("WOO_CONNECT")}
+                className="cursor-pointer w-50 h-50 bg-primary text-white rounded-full flex items-center justify-between">
+                Add New Store
+                <Plus />
+              </span>
+            </div>
             <select
               value={selectedStoreId}
               onChange={(e) => setSelectedStoreId(e.target.value)}
@@ -639,7 +666,15 @@ export default function IndexPopup() {
                 ))}
             </select>
           </div>
+        ) : (
+          <div
+            onClick={() => setView("WOO_CONNECT")}
+            className="cursor-pointer w-50 h-50 bg-primary text-white rounded-full flex items-center justify-between">
+            Add New Store
+            <Plus />
+          </div>
         )}
+
         <div className="bg-slate-50 border border-slate-200 rounded-[32px] p-8 mb-8 text-center shadow-sm">
           <p className="text-primary font-black uppercase tracking-widest text-base mb-2">
             Bulk Capture Engine
@@ -653,7 +688,7 @@ export default function IndexPopup() {
         <div className="mb-10">
           <div className="flex items-center justify-between mb-5 px-2">
             <h3 className="text-base font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-              <Package size={18} /> Selected Tray
+              <Package size={18} /> Selected Products
             </h3>
             <span className="text-base font-bold text-slate-300 italic">
               {selectedProducts?.length > 0 ? "Ready to process" : "Empty"}
